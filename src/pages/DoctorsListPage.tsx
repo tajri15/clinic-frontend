@@ -31,7 +31,6 @@ export default function DoctorsListPage() {
             setLoading(true);
             setError(null);
             try {
-                // Kirim request dengan parameter page dan size
                 const response = await api.get(`/doctors?page=${currentPage}&size=6&sort=name,asc`);
                 setDoctorPage(response.data);
             } catch (err) {
@@ -41,11 +40,17 @@ export default function DoctorsListPage() {
             }
         };
         fetchDoctors();
-    }, [currentPage]); // useEffect akan berjalan lagi setiap kali currentPage berubah
+    }, [currentPage]);
 
     if (loading) return <div className="p-8 text-center">Loading...</div>;
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
-    if (!doctorPage || doctorPage.content.length === 0) return <div className="p-8 text-center">Tidak ada dokter ditemukan.</div>
+
+    // ======================================================================
+    // PERBAIKAN DI SINI: Cek apakah doctorPage ada SEBELUM mengakses .content
+    // ======================================================================
+    if (!doctorPage || doctorPage.content.length === 0) {
+        return <div className="p-8 text-center">Tidak ada dokter ditemukan.</div>;
+    }
 
     return (
         <div className="p-8">
@@ -55,7 +60,7 @@ export default function DoctorsListPage() {
                     <DoctorCard key={doctor.id} doctor={doctor} />
                 ))}
             </div>
-
+            
             {/* --- Tombol Paginasi --- */}
             <div className="flex justify-center items-center mt-8 space-x-4">
                 <button 
