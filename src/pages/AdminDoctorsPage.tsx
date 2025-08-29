@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 interface Doctor {
@@ -11,8 +12,7 @@ interface Doctor {
 export default function AdminDoctorsPage() {
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [loading, setLoading] = useState(true);
-
-    // State untuk form
+    
     const [name, setName] = useState('');
     const [specialization, setSpecialization] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -21,7 +21,6 @@ export default function AdminDoctorsPage() {
 
     const fetchDoctors = async () => {
         try {
-            // Kita pakai API paginasi tapi ambil semua data untuk sementara
             const response = await api.get('/doctors?sort=id,desc'); 
             setDoctors(response.data.content);
         } catch (err) {
@@ -46,7 +45,6 @@ export default function AdminDoctorsPage() {
             setSuccess('Doctor added successfully!');
             setName('');
             setSpecialization('');
-            // Muat ulang daftar dokter setelah berhasil menambah
             fetchDoctors(); 
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to add doctor.');
@@ -55,13 +53,27 @@ export default function AdminDoctorsPage() {
         }
     };
 
+    // FUNGSI BARU UNTUK MENGHAPUS DOKTER
+    const handleDeleteDoctor = async (doctorId: number) => {
+        // Minta konfirmasi dari user
+        if (window.confirm(`Are you sure you want to delete doctor with ID ${doctorId}? This action cannot be undone.`)) {
+            try {
+                await api.delete(`/admin/doctors/${doctorId}`);
+                setSuccess('Doctor deleted successfully!');
+                // Refresh daftar dokter dengan memfilter dokter yang sudah dihapus
+                setDoctors(prevDoctors => prevDoctors.filter(doc => doc.id !== doctorId));
+            } catch (err: any) {
+                setError(err.response?.data?.message || 'Failed to delete doctor.');
+            }
+        }
+    };
+
     if (loading) return <div className="p-8 text-center">Loading doctors...</div>;
 
     return (
         <div className="p-8 max-w-6xl mx-auto">
             <h1 className="text-3xl font-bold mb-6">Manage Doctors</h1>
-
-            {/* Form Tambah Dokter */}
+            
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
                 <h2 className="text-2xl font-bold mb-4">Add New Doctor</h2>
                 <form onSubmit={handleAddDoctor} className="space-y-4">
@@ -81,7 +93,6 @@ export default function AdminDoctorsPage() {
                 </form>
             </div>
 
-            {/* Tabel Daftar Dokter */}
             <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                 <table className="min-w-full">
                     <thead className="bg-gray-700">
@@ -89,6 +100,7 @@ export default function AdminDoctorsPage() {
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Specialization</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700">
@@ -97,6 +109,21 @@ export default function AdminDoctorsPage() {
                                 <td className="px-6 py-4 whitespace-nowrap">{doctor.id}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">{doctor.name}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">{doctor.specialization}</td>
+                                <td className="px-6 py-4 whitespace-nowrap space-x-4">
+                                    <Link 
+                                        to={`/admin/schedules/${doctor.id}`} 
+                                        className="text-indigo-400 hover:text-indigo-300 font-semibold"
+                                    >
+                                        Atur Jadwal
+                                    </Link>
+                                    {/* TOMBOL HAPUS BARU */}
+                                    <button 
+                                        onClick={() => handleDeleteDoctor(doctor.id)} 
+                                        className="text-red-500 hover:text-red-400 font-semibold"
+                                    >
+                                        Hapus
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

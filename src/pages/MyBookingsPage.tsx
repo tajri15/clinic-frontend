@@ -27,12 +27,13 @@ export default function MyBookingsPage() {
         fetchAppointments();
     }, []);
 
-    if (loading) return <div className="p-8 text-center">Loading...</div>;
+    // Tambahkan text-white pada state loading dan error
+    if (loading) return <div className="p-8 text-center text-white">Loading...</div>;
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
     return (
         <div className="p-8 max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6">Riwayat Janji Temu Saya</h1>
+            <h1 className="text-3xl font-bold mb-6 text-white">Riwayat Janji Temu Saya</h1>
             <div className="bg-gray-800 rounded-lg shadow-lg p-6">
                 {appointments.length > 0 ? (
                     <ul className="divide-y divide-gray-700">
@@ -51,7 +52,7 @@ export default function MyBookingsPage() {
                         ))}
                     </ul>
                 ) : (
-                    <p>Anda belum memiliki riwayat janji temu.</p>
+                    <p className="text-gray-300">Anda belum memiliki riwayat janji temu.</p>
                 )}
             </div>
         </div>

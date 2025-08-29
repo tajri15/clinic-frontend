@@ -68,30 +68,30 @@ export default function DoctorDetailPage() {
         }
     };
 
-    if (loading) return <div className="p-8 text-center">Loading jadwal...</div>;
+    if (loading) return <div className="p-8 text-center text-white">Loading jadwal...</div>;
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
     return (
         <div className="p-8 max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6">Jadwal Praktek</h1>
+            <h1 className="text-3xl font-bold mb-6 text-white">Jadwal Praktek</h1>
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
                 {schedules.length > 0 ? (
                     <ul className="space-y-3">
                         {schedules.map(schedule => (
-                            <li key={schedule.id} className="text-lg">
+                            <li key={schedule.id} className="text-lg text-gray-300">
                                 <span className="font-semibold text-indigo-400 w-24 inline-block">{schedule.dayOfWeek}:</span>
                                 <span>{schedule.startTime} - {schedule.endTime}</span>
                             </li>
                         ))}
                     </ul>
                 ) : (
-                    <p>Dokter ini belum memiliki jadwal.</p>
+                    <p className="text-gray-400">Dokter ini belum memiliki jadwal.</p>
                 )}
             </div>
 
             {/* --- BAGIAN BOOKING --- */}
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <h2 className="text-2xl font-bold mb-4">Buat Janji Temu</h2>
+                <h2 className="text-2xl font-bold mb-4 text-white">Buat Janji Temu</h2>
                 {isAuthenticated ? (
                     <form onSubmit={handleBooking}>
                         <div className="mb-4">
